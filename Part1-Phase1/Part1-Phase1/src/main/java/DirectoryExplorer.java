@@ -1,34 +1,34 @@
 import java.io.File;
-import java.util.ArrayList;
+import java.util.HashMap;
 
 public class DirectoryExplorer {
     private File directory;
-    private ArrayList<File> srcFiles;
+    private HashMap<String, File> srcFiles;
 
-    public DirectoryExplorer(String path) {
+    public DirectoryExplorer(String name, String path) {
         this.directory = new File(path + "/src");
-        ArrayList<File> files = new ArrayList<>();
-        addList(files, this.directory.listFiles());
+        HashMap<String, File> files = new HashMap<>();
+        addList(files, name, this.directory.listFiles());
         for (File file :
-                files) {
+                this.directory.listFiles()) {
             if (file.isDirectory()) {
-                addList(files, file.listFiles());
+                addList(files, name, file.listFiles());
             } else if (file.isFile() && file.getName().endsWith(".java")) {
-                srcFiles.add(file);
+                srcFiles.put(name, file);
             }
         }
     }
 
-    private ArrayList addList(ArrayList list, File[] files) {
-        ArrayList<File> newList = new ArrayList<>();
+    private HashMap addList(HashMap map, String name, File[] files) {
+        HashMap<String, File> newMap = new HashMap<>();
         for (File file :
                 files) {
-            list.add(file);
+            newMap.put(name, file);
         }
-        return newList;
+        return newMap;
     }
 
-    public ArrayList getFiles() {
+    public HashMap getFiles() {
         return this.srcFiles;
     }
 }
