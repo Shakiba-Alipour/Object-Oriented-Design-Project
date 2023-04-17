@@ -7,12 +7,12 @@ public class DirectoryExplorer {
 
     public DirectoryExplorer(String name, String path) {
         this.directory = new File(path + "/src");
-        HashMap<String, File> files = new HashMap<>();
-        addList(files, name, this.directory.listFiles());
+        this.srcFiles = new HashMap<>();
+        addList(this.srcFiles, name, this.directory.listFiles());
         for (File file :
                 this.directory.listFiles()) {
             if (file.isDirectory()) {
-                addList(files, name, file.listFiles());
+                addList(this.srcFiles, name, file.listFiles());
             } else if (file.isFile() && file.getName().endsWith(".java")) {
                 srcFiles.put(name, file);
             }
