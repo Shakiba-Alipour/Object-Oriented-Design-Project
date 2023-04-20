@@ -10,27 +10,28 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.*;
+import java.util.List;
 
 public class Parser {
 
-    private File file;
     private JavaParser jp;
-    private ParseResult<CompilationUnit> cu;
+    private final File file;
+    private final ParseResult<CompilationUnit> cu;
     private String projectName;
     private BufferedReader fileReader;
-    private XSSFWorkbook workbook;
+    private final XSSFWorkbook workbook;
     private XSSFSheet sheet;
 
     public Parser(File file, String projectName, XSSFWorkbook workbook) throws FileNotFoundException {
         this.file = file;
         this.projectName = projectName;
-        this.jp = new JavaParser();
+        jp = new JavaParser();
         this.fileReader = new BufferedReader(new FileReader(file));
         this.cu = jp.parse(file);
         this.workbook = workbook;
         //create sheet
-        String[] completeFileName = file.getName().split(".");
-        this.sheet = workbook.createSheet(projectName + "/" + completeFileName[0]);
+//        String[] completeFileName = file.getName().split(".");
+        this.sheet = workbook.createSheet(projectName + "-" + file.getName());
         fillColumnsNames();
     }
 
@@ -159,7 +160,8 @@ public class Parser {
         try {
             String line;
             while ((line = this.fileReader.readLine()) != null) {
-                CompilationUnit cu = StaticJavaParser.parse(line);
+
+                ParseResult<CompilationUnit> cu = jp.parse(line);
 
                 class Visitor extends VoidVisitorAdapter<Void> {
 
@@ -260,7 +262,7 @@ public class Parser {
                             cell.setCellValue("0");
                         }
 
-                        // row 10: implemeny=ts
+                        // row 10: implement=ts
                         if (cid.getImplementedTypes().size() > 0) {
                             cell = this.sheet.createRow(10).createCell(1);
                             for (ClassOrInterfaceType implementedType : cid.getImplementedTypes()) {
@@ -269,6 +271,26 @@ public class Parser {
                         } else {
                             cell.setCellValue("0");
                         }
+
+                        // row 11: children
+                        List<ClassOrInterfaceDeclaration> children = cid.findAll(ClassOrInterfaceDeclaration.class);
+                        if (children.isEmpty()) {
+                            cell = this.sheet.createRow(11).createCell(1);
+                            cell.setCellValue("0");
+                        } else if (children.size() == 1) {
+                            cell = this.sheet.createRow(11).createCell(1);
+                            cell.setCellValue(children.get(0).getNameAsString());
+                        } else {
+                            cell = this.sheet.createRow(11).createCell(1);
+                            for (int i = 0; i < children.size(); i++) {
+                                cell.setCellValue(children.get(i).getNameAsString());
+                                if (i != children.size() - 1) {
+                                    cell.setCellValue(cell.getStringCellValue() + ", " + children.get(i).getNameAsString());
+                                }
+                            }
+                        }
+
+
                     }
 
                     // row 14
@@ -287,6 +309,9 @@ public class Parser {
                         cell.setCellValue(cell.getRichStringCellValue() + "\n" + md.getTypeAsString()
                                 + " " + md.getNameAsString() + " (" + parameters + ")");
                     }
+
+                    public void visit(ParseResult<CompilationUnit> cu, Object o) {
+                    }
                 }
 
 
@@ -301,4 +326,11 @@ public class Parser {
 
     }
 
+    public static void main(String[] args) throws IOException {
+//        DirectoryExplorer ex=new DirectoryExplorer("QuickUML","D:\\University\Object Oriented Design\\Project\Part1-Phase1\\Open Source OO project-20230329\\1 - QuickUML 2001");
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        File file = new File("GifEncoder.java");
+        Parser parser = new Parser(file, "project", workbook);
+        parser.parse();
+    }
 }
