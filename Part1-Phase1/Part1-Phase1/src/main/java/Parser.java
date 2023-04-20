@@ -1,6 +1,7 @@
 import com.github.javaparser.*;
 import com.github.javaparser.ast.*;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
@@ -290,7 +291,26 @@ public class Parser {
                             }
                         }
 
-
+                        // row 12: constructors
+                        List<ConstructorDeclaration> constructors = cid.findAll(ConstructorDeclaration.class);
+                        if (constructors.isEmpty()) {
+                            cell = this.sheet.createRow(12).createCell(1);
+                            cell.setCellValue("no constructors");
+                        } else if (constructors.size() == 1) {
+                            cell = this.sheet.createRow(12).createCell(1);
+                            cell.setCellValue(constructors.get(0).getAccessSpecifier().toString() + " " +
+                                    constructors.get(0).getNameAsString());
+                        } else {
+                            cell = this.sheet.createRow(12).createCell(1);
+                            for (int i = 0; i < constructors.size(); i++) {
+                                cell.setCellValue(constructors.get(i).getNameAsString());
+                                if (i != constructors.size() - 1) {
+                                    cell.setCellValue(cell.getStringCellValue() + ", " +
+                                            constructors.get(0).getAccessSpecifier().toString() + " " +
+                                            constructors.get(0).getNameAsString());
+                                }
+                            }
+                        }
                     }
 
                     // row 14
