@@ -9,6 +9,7 @@ import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.dom4j.Visitor;
 
 import java.io.*;
 import java.util.List;
@@ -275,42 +276,52 @@ public class Parser {
 
                         // row 11: children
                         List<ClassOrInterfaceDeclaration> children = cid.findAll(ClassOrInterfaceDeclaration.class);
+                        cell = this.sheet.createRow(11).createCell(1);
                         if (children.isEmpty()) {
-                            cell = this.sheet.createRow(11).createCell(1);
                             cell.setCellValue("0");
                         } else if (children.size() == 1) {
-                            cell = this.sheet.createRow(11).createCell(1);
                             cell.setCellValue(children.get(0).getNameAsString());
                         } else {
-                            cell = this.sheet.createRow(11).createCell(1);
                             for (int i = 0; i < children.size(); i++) {
                                 cell.setCellValue(children.get(i).getNameAsString());
-                                if (i != children.size() - 1) {
-                                    cell.setCellValue(cell.getStringCellValue() + ", " + children.get(i).getNameAsString());
-                                }
+                                cell.setCellValue(cell.getStringCellValue() + ", " + children.get(i).getNameAsString());
                             }
                         }
 
                         // row 12: constructors
                         List<ConstructorDeclaration> constructors = cid.findAll(ConstructorDeclaration.class);
+                        cell = this.sheet.createRow(12).createCell(1);
                         if (constructors.isEmpty()) {
-                            cell = this.sheet.createRow(12).createCell(1);
                             cell.setCellValue("no constructors");
                         } else if (constructors.size() == 1) {
-                            cell = this.sheet.createRow(12).createCell(1);
                             cell.setCellValue(constructors.get(0).getAccessSpecifier().toString() + " " +
                                     constructors.get(0).getNameAsString());
                         } else {
-                            cell = this.sheet.createRow(12).createCell(1);
                             for (int i = 0; i < constructors.size(); i++) {
                                 cell.setCellValue(constructors.get(i).getNameAsString());
-                                if (i != constructors.size() - 1) {
-                                    cell.setCellValue(cell.getStringCellValue() + ", " +
-                                            constructors.get(0).getAccessSpecifier().toString() + " " +
-                                            constructors.get(0).getNameAsString());
-                                }
+                                cell.setCellValue(cell.getStringCellValue() + ", " +
+                                        constructors.get(0).getAccessSpecifier().toString() + " " +
+                                        constructors.get(0).getNameAsString());
                             }
                         }
+
+                        // row 13: fields
+                        List<FieldDeclaration> fields = cid.getFields();
+                        cell = this.sheet.createRow(13).createCell(1);
+                        if (fields.isEmpty()) {
+                            cell.setCellValue("no fields");
+                        } else if (fields.size() == 1) {
+                            cell.setCellValue(fields.get(0).getAccessSpecifier().toString() + " " +
+                                    fields.get(0).toString());
+                        } else {
+                            for (int i = 0; i < fields.size(); i++) {
+                                cell.setCellValue(fields.get(i).toString());
+                                cell.setCellValue(cell.getStringCellValue() + ", " +
+                                        fields.get(0).getAccessSpecifier().toString() + " " +
+                                        fields.get(0).toString());
+                            }
+                        }
+
                     }
 
                     // row 14
