@@ -75,5 +75,10 @@ public class Parser {
         File file = new File("GifEncoder.java");
         Parser parser = new Parser(file, "project", workbook);
         parser.parse();
+
+        for (int i = 0; i < parser.sheet.getLastRowNum(); i++) {
+            System.out.println(parser.sheet.getRow(i).getCell(0) + ": ");
+            System.out.println(parser.sheet.getRow(i).getCell(1));
+        }
     }
 }
