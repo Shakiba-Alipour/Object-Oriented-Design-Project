@@ -25,6 +25,7 @@ public class JavaClass {
     public List<String> aggregatedList;
     public List<String> delegatedList;
     public List<String> compositedList;
+    public List<String> instantiatedList;
 
     public JavaClass() {
         this.children = new ArrayList<>();
@@ -40,5 +41,6 @@ public class JavaClass {
         this.aggregatedList = new ArrayList<>();
         this.delegatedList = new ArrayList<>();
         this.compositedList = new ArrayList<>();
+        this.instantiatedList = new ArrayList<>();
     }
 }

@@ -29,6 +29,7 @@ public class Parser {
                     JavaClass javaClass = new JavaClass();
                     setSomeJClassFieldsForTable(javaClass, classOrInterface, packageName);
                     setAssociation(javaClass, extractor, classOrInterface);
+                    setInstantiation(javaClass, extractor, classOrInterface);
                     setChildren(javaClass, cu);
                     setVisibility(classOrInterface, javaClass);
                     setInheritance(javaClass, extractor, cu);
@@ -142,5 +143,9 @@ public class Parser {
 
     private void setComposition(JavaClass javaClass, FCIExtractor extractor, FieldDeclaration fd) {
         javaClass.compositedList = extractor.getCompositedList(fd);
+    }
+
+    private void setInstantiation(JavaClass javaClass, FCIExtractor extractor, ClassOrInterfaceDeclaration coid) {
+        javaClass.instantiatedList = extractor.getInstantiatedList(coid);
     }
 }

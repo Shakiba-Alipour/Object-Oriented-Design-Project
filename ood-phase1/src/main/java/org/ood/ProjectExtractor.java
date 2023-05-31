@@ -23,7 +23,7 @@ public class ProjectExtractor {
             writer.append("Project Name,Package Name,Class Name,Class Type,Class Visibility,Is Abstract," +
                     "Is Static,Is Final,Is Interface,Extends,Implements,Children,Fields,Methods,Overrides," +
                     "Static Methods,final Methods , Abstract Methods, Association, Aggregation, Delegation, " +
-                    "Composition\n");
+                    "Composition, Instantiation\n");
 
             for (JavaClass jclass : javaClassList) {
                 writer.append(projectName).append(",");
@@ -98,6 +98,11 @@ public class ProjectExtractor {
 
                 for (String composited : jclass.compositedList) {
                     writer.append(composited).append(" ");
+                }
+                writer.append(",");
+
+                for (String instantiated : jclass.instantiatedList) {
+                    writer.append(instantiated).append(" ");
                 }
                 writer.append("\n");
             }

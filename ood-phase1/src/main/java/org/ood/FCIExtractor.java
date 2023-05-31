@@ -6,6 +6,7 @@ import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.MethodCallExpr;
+import com.github.javaparser.ast.expr.ObjectCreationExpr;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 
@@ -21,6 +22,7 @@ public class FCIExtractor extends VoidVisitorAdapter<Void> {
     private ArrayList<String> delegatedList;
 
     private ArrayList<String> compositedList;
+    private ArrayList<String> instantiatedList;
 
     public static List<String> getFieldNames(ClassOrInterfaceDeclaration cls) {
         return cls.getFields().stream()
@@ -83,11 +85,11 @@ public class FCIExtractor extends VoidVisitorAdapter<Void> {
 
     public List<String> getDelegatedList(MethodDeclaration md) {
         delegatedList = new ArrayList<>();
-//        if (md.getBody().isPresent()) {
-//            md.getBody().get().findAll(MethodCallExpr.class).forEach(methodCall -> {
-//                delegatedList.add(methodCall.resolve().getClassName());
-//            });
-//        }
+        if (md.getBody().isPresent()) {
+            md.getBody().get().findAll(MethodCallExpr.class).forEach(methodCall -> {
+                delegatedList.add(methodCall.resolve().getClassName());
+            });
+        }
         return delegatedList;
     }
 
@@ -101,5 +103,13 @@ public class FCIExtractor extends VoidVisitorAdapter<Void> {
             }
         }
         return compositedList;
+    }
+
+    public List<String> getInstantiatedList(ClassOrInterfaceDeclaration cls) {
+        instantiatedList = new ArrayList<>();
+        cls.findAll(ObjectCreationExpr.class).forEach(objectCreation -> {
+            instantiatedList.add(String.valueOf(objectCreation.getType().getName()));
+        });
+        return instantiatedList;
     }
 }
