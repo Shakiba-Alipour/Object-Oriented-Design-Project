@@ -5,6 +5,7 @@ import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 
 import java.io.File;
@@ -27,11 +28,21 @@ public class Parser {
                 for (ClassOrInterfaceDeclaration classOrInterface : cu.findAll(ClassOrInterfaceDeclaration.class)) {
                     JavaClass javaClass = new JavaClass();
                     setSomeJClassFieldsForTable(javaClass, classOrInterface, packageName);
+                    setAssociation(javaClass, extractor, classOrInterface);
                     setChildren(javaClass, cu);
                     setVisibility(classOrInterface, javaClass);
                     setInheritance(javaClass, extractor, cu);
                     setFields(classOrInterface, javaClass);
                     setMethods(javaClass, cu);
+
+                    for (FieldDeclaration field : classOrInterface.getFields()) {
+                        setAggregation(javaClass, extractor, field);
+                        setComposition(javaClass, extractor, field);
+                    }
+
+                    for (MethodDeclaration method : classOrInterface.getMethods()) {
+                        setDelegation(javaClass, extractor, method);
+                    }
 
                     javaClassList.add(javaClass);
                 }
@@ -42,6 +53,7 @@ public class Parser {
 
         return javaClassList;
     }
+
     private void setType(JavaClass javaClass, ClassOrInterfaceDeclaration coid) {
         javaClass.type = 1;
         if (coid.isInterface()) {
@@ -51,12 +63,15 @@ public class Parser {
             javaClass.type = 3;
         }
     }
+
     private String setPackageName(CompilationUnit cu) {
         return cu.getPackageDeclaration().map(pd -> pd.getName().toString()).orElse("");
     }
+
     private void setFields(ClassOrInterfaceDeclaration coid, JavaClass javaClass) {
         javaClass.fields = FCIExtractor.getFieldNames(coid);
     }
+
     private void setMethods(JavaClass javaClass, CompilationUnit cu) {
         MethodExtractor methodFinder = new MethodExtractor();
         var methodDecs = cu.findAll(MethodDeclaration.class);
@@ -88,12 +103,6 @@ public class Parser {
         if (javaClass.Implements.isEmpty()) {
             javaClass.Implements = new ArrayList<>(List.of("0"));
         }
-//        if (javaClass.Extends.isEmpty()) {
-//            javaClass.Extends.add("0");
-//        }
-//        if (javaClass.Implements.isEmpty()) {
-//            javaClass.Implements.add("0");
-//        }
     }
 
     private void setVisibility(ClassOrInterfaceDeclaration coid, JavaClass javaClass) {
@@ -108,6 +117,7 @@ public class Parser {
             }
         }
     }
+
     private void setSomeJClassFieldsForTable(JavaClass javaClass, ClassOrInterfaceDeclaration coid, String packageName) {
         javaClass.packageName = packageName;
         javaClass.name = coid.getNameAsString();
@@ -116,5 +126,21 @@ public class Parser {
         javaClass.isFinal = coid.isFinal() ? 1 : 0;
         javaClass.isStatic = coid.isStatic() ? 1 : 0;
         setType(javaClass, coid);
+    }
+
+    private void setAssociation(JavaClass javaClass, FCIExtractor extractor, ClassOrInterfaceDeclaration coid) {
+        javaClass.associatedList = extractor.getAssociationList(coid);
+    }
+
+    private void setAggregation(JavaClass javaClass, FCIExtractor extractor, FieldDeclaration fd) {
+        javaClass.aggregatedList = extractor.getAggregationList(fd);
+    }
+
+    private void setDelegation(JavaClass javaClass, FCIExtractor extractor, MethodDeclaration md) {
+        javaClass.delegatedList = extractor.getDelegatedList(md);
+    }
+
+    private void setComposition(JavaClass javaClass, FCIExtractor extractor, FieldDeclaration fd) {
+        javaClass.compositedList = extractor.getCompositedList(fd);
     }
 }

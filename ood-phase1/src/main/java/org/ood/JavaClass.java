@@ -21,7 +21,12 @@ public class JavaClass {
     public List<String> Implements;
     public List<String> children;
     public List<String> fields;
-    public JavaClass(){
+    public List<String> associatedList;
+    public List<String> aggregatedList;
+    public List<String> delegatedList;
+    public List<String> compositedList;
+
+    public JavaClass() {
         this.children = new ArrayList<>();
         this.Extends = new ArrayList<>();
         this.Implements = new ArrayList<>();
@@ -31,5 +36,9 @@ public class JavaClass {
         this.abstractMethods = new ArrayList<>();
         this.finalMethods = new ArrayList<>();
         this.staticMethods = new ArrayList<>();
+        this.associatedList = new ArrayList<>();
+        this.aggregatedList = new ArrayList<>();
+        this.delegatedList = new ArrayList<>();
+        this.compositedList = new ArrayList<>();
     }
 }

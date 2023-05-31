@@ -9,6 +9,7 @@ import java.util.Objects;
 
 public class ProjectExtractor {
     static Parser parser;
+
     public static void extractProject(String projectPath, String projectName) throws IOException {
 
         parser = new Parser();
@@ -19,7 +20,10 @@ public class ProjectExtractor {
             List<JavaClass> javaClassList = parser.parse(javaFiles);
 
             FileWriter writer = new FileWriter(projectName.concat(".csv"));
-            writer.append("Project Name,Package Name,Class Name,Class Type,Class Visibilty,Is Abstract,Is Static,Is Final,Is Interface,Extends,Implements,Children,Fields,Methods,Overrides,Static Methods,final Methods , Abstract Methods\n");
+            writer.append("Project Name,Package Name,Class Name,Class Type,Class Visibility,Is Abstract," +
+                    "Is Static,Is Final,Is Interface,Extends,Implements,Children,Fields,Methods,Overrides," +
+                    "Static Methods,final Methods , Abstract Methods, Association, Aggregation, Delegation, " +
+                    "Composition\n");
 
             for (JavaClass jclass : javaClassList) {
                 writer.append(projectName).append(",");
@@ -67,13 +71,33 @@ public class ProjectExtractor {
                 }
                 writer.append(",");
 
-                for(String fmethod : jclass.finalMethods){
+                for (String fmethod : jclass.finalMethods) {
                     writer.append(fmethod).append(" ");
                 }
                 writer.append(",");
 
-                for(String amethod : jclass.abstractMethods){
+                for (String amethod : jclass.abstractMethods) {
                     writer.append(amethod).append(" ");
+                }
+                writer.append(",");
+
+                for (String associated : jclass.associatedList) {
+                    writer.append(associated).append(" ");
+                }
+                writer.append(",");
+
+                for (String aggregated : jclass.aggregatedList) {
+                    writer.append(aggregated).append(" ");
+                }
+                writer.append(",");
+
+                for (String delegated : jclass.delegatedList) {
+                    writer.append(delegated).append(" ");
+                }
+                writer.append(",");
+
+                for (String composited : jclass.compositedList) {
+                    writer.append(composited).append(" ");
                 }
                 writer.append("\n");
             }
