@@ -7,6 +7,8 @@ import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.ObjectCreationExpr;
+import com.github.javaparser.ast.stmt.ExpressionStmt;
+import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 
@@ -83,13 +85,17 @@ public class FCIExtractor extends VoidVisitorAdapter<Void> {
         return aggregatedList;
     }
 
-    public List<String> getDelegatedList(MethodDeclaration md) {
+    public List<String> getDelegatedList(String className, MethodDeclaration md) {
         delegatedList = new ArrayList<>();
-        if (md.getBody().isPresent()) {
-            md.getBody().get().findAll(MethodCallExpr.class).forEach(methodCall -> {
-                delegatedList.add(methodCall.resolve().getClassName());
-            });
-        }
+        md.findAll(MethodCallExpr.class).forEach(methodCall -> {
+            if (methodCall.getScope().isPresent()) {
+                // If the method call has a scope, check if it matches the class name
+                String scopeName = methodCall.getScope().get().toString();
+                if (scopeName.equals(className)) {
+                    delegatedList.add(String.valueOf(methodCall.getName()));
+                }
+            }
+        });
         return delegatedList;
     }
 

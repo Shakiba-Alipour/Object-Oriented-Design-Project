@@ -138,7 +138,7 @@ public class Parser {
     }
 
     private void setDelegation(JavaClass javaClass, FCIExtractor extractor, MethodDeclaration md) {
-        javaClass.delegatedList = extractor.getDelegatedList(md);
+        javaClass.delegatedList = extractor.getDelegatedList(javaClass.name, md);
     }
 
     private void setComposition(JavaClass javaClass, FCIExtractor extractor, FieldDeclaration fd) {
