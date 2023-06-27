@@ -7,6 +7,7 @@ import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.expr.MethodCallExpr;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,6 +44,7 @@ public class Parser {
 
                     for (MethodDeclaration method : classOrInterface.getMethods()) {
                         setDelegation(javaClass, extractor, method);
+                        setAPI(javaClass,extractor,method);
                     }
 
                     javaClassList.add(javaClass);
@@ -147,5 +149,9 @@ public class Parser {
 
     private void setInstantiation(JavaClass javaClass, FCIExtractor extractor, ClassOrInterfaceDeclaration coid) {
         javaClass.instantiatedList = extractor.getInstantiatedList(coid);
+    }
+
+    private void setAPI(JavaClass javaClass, FCIExtractor extractor, MethodDeclaration md) {
+        javaClass.api = extractor.getApiInfo(md);
     }
 }

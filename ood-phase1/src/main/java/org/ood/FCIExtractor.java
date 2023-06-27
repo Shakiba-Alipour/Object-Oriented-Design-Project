@@ -7,8 +7,6 @@ import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.ObjectCreationExpr;
-import com.github.javaparser.ast.stmt.ExpressionStmt;
-import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 
@@ -25,6 +23,7 @@ public class FCIExtractor extends VoidVisitorAdapter<Void> {
 
     private ArrayList<String> compositedList;
     private ArrayList<String> instantiatedList;
+    private String apiInfo;
 
     public static List<String> getFieldNames(ClassOrInterfaceDeclaration cls) {
         return cls.getFields().stream()
@@ -117,5 +116,19 @@ public class FCIExtractor extends VoidVisitorAdapter<Void> {
             instantiatedList.add(String.valueOf(objectCreation.getType().getName()));
         });
         return instantiatedList;
+    }
+
+    public String getApiInfo(MethodDeclaration md) {
+        md.findAll(MethodCallExpr.class).forEach(methodCall -> {
+            String apiType = methodCall.getScope().map(scope -> scope.toString()).orElse("");
+            String apiParameters = "";
+
+            // Get the type and name of each argument of the method call
+            for (var argument : methodCall.getArguments()) {
+                apiParameters = apiParameters+", "+argument.toString();
+            }
+            apiInfo= apiType + ": " + apiParameters;
+        });
+        return apiInfo;
     }
 }

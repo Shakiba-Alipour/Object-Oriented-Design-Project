@@ -26,6 +26,7 @@ public class JavaClass {
     public List<String> delegatedList;
     public List<String> compositedList;
     public List<String> instantiatedList;
+    public String api;
 
     public JavaClass() {
         this.children = new ArrayList<>();
